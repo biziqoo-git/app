@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>biziqoo — Health Clinic</title>
+<link rel="manifest" href="client/manifest.json">
+<link rel="icon" href="client/assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<link rel="stylesheet" href="core/css/core.css">
+<link rel="stylesheet" href="core/css/header.css">
+<link rel="stylesheet" href="core/css/sidebar.css">
+<link rel="stylesheet" href="core/css/bottom-nav.css">
+<link rel="stylesheet" href="core/css/layout.css">
+<link rel="stylesheet" href="core/css/components.css">
+<link rel="stylesheet" href="core/css/responsive.css">
+</head>
+<body>
+<div class="bq-app">
+  <div class="bq-sidebar-overlay" id="bqOverlay"></div>
+  <aside class="bq-sidebar" id="bqSidebar">
+    <div class="bq-sidebar-head"><img class="bq-sidebar-logo" src="client/assets/name.png" alt="Organisation"></div>
+    <nav class="bq-sidebar-nav">
+      <button class="bq-nav-item active"><i data-lucide="layout-dashboard"></i>Dashboard</button>
+      <button class="bq-nav-item"><i data-lucide="users"></i>Patients</button>
+      <button class="bq-nav-item"><i data-lucide="calendar-days"></i>Appointments</button>
+      <button class="bq-nav-item"><i data-lucide="receipt"></i>Transactions</button>
+      <button class="bq-nav-item"><i data-lucide="building-2"></i>Branches</button>
+      <button class="bq-nav-item"><i data-lucide="stethoscope"></i>Doctors / Therapist</button>
+      <button class="bq-nav-item"><i data-lucide="badge"></i>Staffs</button>
+      <button class="bq-nav-item"><i data-lucide="settings"></i>Clinic Details</button>
+      <button class="bq-nav-item"><i data-lucide="users-round"></i>Users</button>
+    </nav>
+    <div class="bq-sidebar-footer"><img src="client/assets/logo-cm.png" alt="biziqoo"></div>
+  </aside>
+
+  <div class="bq-main-frame">
+    <header class="bq-header">
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="bq-header-menu" id="bqMenu" aria-label="Menu"><i data-lucide="menu"></i></button>
+        <a class="bq-header-brand" href="./"><img class="bq-header-logo" src="client/assets/logo.png" alt=""><span class="bq-header-name">biziqoo</span></a>
+      </div>
+      <div class="bq-header-actions"><button class="bq-header-action" aria-label="Notifications"><i data-lucide="bell"></i></button></div>
+    </header>
+    <main class="bq-main">
+      <div style="padding:24px;max-width:1120px;margin:auto">
+        <h1 class="bq-page-title">Health Clinic</h1>
+        <p class="bq-page-subtitle">biziqoo core shell with the client's existing clinic modules and Firebase data model preserved.</p>
+        <div class="bq-card" style="padding:20px;margin-top:20px">
+          <strong>Source-of-truth modules preserved</strong>
+          <p class="bq-page-subtitle">Open the client module files under <code>client/</code>. Their original Firebase collection/document names are recorded in <code>client/module-inventory.json</code>.</p>
+        </div>
+      </div>
+    </main>
+    <nav class="bq-bottom-nav">
+      <button class="bq-bottom-item active"><i data-lucide="house"></i><span>Home</span></button>
+      <button class="bq-bottom-item"><i data-lucide="users"></i><span>Patients</span></button>
+      <button class="bq-bottom-item"><i data-lucide="calendar-days"></i><span>Schedule</span></button>
+      <button class="bq-bottom-item"><i data-lucide="receipt"></i><span>Transactions</span></button>
+      <button class="bq-bottom-item" id="bqBottomMenu"><i data-lucide="menu"></i><span>Menu</span></button>
+    </nav>
+  </div>
+</div>
+<script>
+lucide.createIcons();
+const s=document.getElementById('bqSidebar'),o=document.getElementById('bqOverlay');
+document.getElementById('bqMenu').onclick=()=>{s.classList.add('open');o.classList.add('open')};
+o.onclick=()=>{s.classList.remove('open');o.classList.remove('open')};
+document.getElementById('bqBottomMenu').onclick=()=>{s.classList.add('open');o.classList.add('open')};
+</script>
+</body>
+</html>
