@@ -1,588 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#ffffff">
-<title>Biziqoo — Log in</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root {
-  --hostinger-purple: #673de6;
-  --hostinger-purple-hover: #542dbf;
-  --hostinger-navy: #181145;
-  --text-dark: #2f1c6a;
-  --text-muted: #726a95;
-  --border-color: #dcdce6;
-  --border-focus: #673de6;
-  --bg-main: #f4f5f9;
-  --card-bg: #ffffff;
-  --radius: 8px;
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html, body {
-  min-height: 100%;
-  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: var(--bg-main);
-  color: var(--text-dark);
-  -webkit-font-smoothing: antialiased;
-}
-
-.page-wrapper {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px 16px;
-}
-
-/* Header Logo */
-.header {
-  width: 100%;
-  max-width: 440px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  padding: 8px 0;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-}
-
-.brand-symbol {
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, #8b2cff, var(--hostinger-purple));
-  border-radius: 8px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.brand-symbol::after {
-  content: "";
-  width: 12px;
-  height: 12px;
-  background: #ffffff;
-  border-radius: 50%;
-}
-
-.brand-name {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--hostinger-navy);
-  letter-spacing: -0.5px;
-}
-
-.brand-name span {
-  color: var(--hostinger-purple);
-}
-
-.help-link {
-  font-size: 13px;
-  color: var(--text-muted);
-  text-decoration: none;
-}
-
-.help-link a {
-  color: var(--hostinger-purple);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.help-link a:hover {
-  text-decoration: underline;
-}
-
-/* Card Container */
-.auth-card {
-  width: 100%;
-  max-width: 440px;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 40px 36px;
-  box-shadow: 0 4px 24px rgba(24, 17, 69, 0.04);
-}
-
-.auth-title {
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--hostinger-navy);
-  letter-spacing: -0.5px;
-  margin-bottom: 8px;
-  text-align: left;
-}
-
-.auth-subtitle {
-  font-size: 14px;
-  color: var(--text-muted);
-  margin-bottom: 28px;
-  line-height: 1.5;
-}
-
-/* Mode Switcher Tabs */
-.tab-group {
-  display: flex;
-  background: #f0eff6;
-  border-radius: 8px;
-  padding: 4px;
-  margin-bottom: 24px;
-}
-
-.tab-btn {
-  flex: 1;
-  padding: 10px 0;
-  border: none;
-  background: transparent;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-muted);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.tab-btn.active {
-  background: #ffffff;
-  color: var(--hostinger-navy);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-}
-
-/* Form Styling */
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.field label {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--hostinger-navy);
-}
-
-.input-container {
-  position: relative;
-  width: 100%;
-}
-
-.input-container input {
-  width: 100%;
-  height: 48px;
-  padding: 0 16px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--hostinger-navy);
-  background: #ffffff;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.input-container input::placeholder {
-  color: #a099c0;
-}
-
-.input-container input:focus {
-  border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(103, 61, 230, 0.15);
-}
-
-.toggle-pwd {
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-}
-
-.toggle-pwd svg {
-  width: 18px;
-  height: 18px;
-}
-
-/* Form Options */
-.form-options {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-}
-
-.remember-me {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--text-dark);
-  cursor: pointer;
-  user-select: none;
-  font-weight: 500;
-}
-
-.remember-me input {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--hostinger-purple);
-  cursor: pointer;
-}
-
-.forgot-pwd {
-  color: var(--hostinger-purple);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.forgot-pwd:hover {
-  text-decoration: underline;
-}
-
-/* Primary Submit Button */
-.btn-primary {
-  width: 100%;
-  height: 48px;
-  background: var(--hostinger-purple);
-  color: #ffffff;
-  border: none;
-  border-radius: var(--radius);
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 0.15s ease, transform 0.05s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 4px;
-}
-
-.btn-primary:hover {
-  background: var(--hostinger-purple-hover);
-}
-
-.btn-primary:active {
-  transform: scale(0.99);
-}
-
-/* Divider */
-.divider {
-  display: flex;
-  align-items: center;
-  text-align: center;
-  margin: 24px 0;
-  color: var(--text-muted);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-
-.divider::before, .divider::after {
-  content: '';
-  flex: 1;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.divider span {
-  padding: 0 12px;
-}
-
-/* Social Buttons */
-.social-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.btn-social {
-  width: 100%;
-  height: 48px;
-  background: #ffffff;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--hostinger-navy);
-  cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
-}
-
-.btn-social:hover {
-  background: #fcfbfd;
-  border-color: #c7c3db;
-}
-
-.btn-social svg {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-}
-
-/* Legal Footer */
-.legal-text {
-  font-size: 12px;
-  color: var(--text-muted);
-  text-align: center;
-  margin-top: 24px;
-  line-height: 1.5;
-}
-
-.legal-text a {
-  color: var(--hostinger-purple);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.legal-text a:hover {
-  text-decoration: underline;
-}
-
-.signup-extra {
-  display: none;
-}
-
-.footer-nav {
-  margin-top: 24px;
-  text-align: center;
-}
-
-.footer-nav a {
-  color: var(--text-muted);
-  font-size: 13px;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.footer-nav a:hover {
-  color: var(--hostinger-navy);
-}
-
-.message-box {
-  display: none;
-  padding: 12px;
-  border-radius: 8px;
-  background: #f0eaff;
-  border: 1px solid #d8c7ff;
-  color: var(--hostinger-purple);
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: 20px;
-}
-
-/* Responsive adjustments */
-@media (max-width: 480px) {
-  .auth-card {
-    padding: 28px 20px;
-    border-radius: 12px;
-  }
-  
-  .auth-title {
-    font-size: 24px;
-  }
-
-  .header {
-    margin-bottom: 16px;
-  }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CMB Portal | Stra Care Secure Login</title>
+    
+    <meta name="theme-color" content="#0052cc">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: { 
+                extend: { 
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }, 
+                    colors: { 
+                        brand: { 50: '#fef2f2', 100: '#fee2e2', 500: '#ef4444', 600: '#0052cc', 700: '#0043a8' } 
+                    } 
+                } 
+            }
+        }
+    </script>
+    
+    <style>
+        .bg-crossed-pattern { background: linear-gradient(135deg, #ffffff 50%, #f8fafc 50%); position: relative; }
+        .bg-crossed-pattern::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px); background-size: 32px 32px; opacity: 0.5; pointer-events: none; }
+        .hover-float { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .hover-float:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(0, 82, 204, 0.15); }
+        #splash-screen { transition: opacity 0.6s ease-out, visibility 0.6s ease-out; }
+        .fade-out { opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
+    </style>
 </head>
-<body>
+<body class="bg-white text-slate-800 font-sans antialiased min-h-screen flex flex-col selection:bg-brand-100 selection:text-brand-700 bg-crossed-pattern">
 
-<div class="page-wrapper">
-  
-  <!-- Header Logo & Support Link -->
-  <header class="header">
-    <a class="brand" href="https://biziqoo.com">
-      <div class="brand-symbol"></div>
-      <div class="brand-name">biz<span>iqoo</span></div>
-    </a>
-    <div class="help-link">Need help? <a href="mailto:info@biziqoo.com">Contact us</a></div>
-  </header>
-
-  <!-- Main Login Card -->
-  <main class="auth-card">
-    <h1 class="auth-title" id="authTitle">Log in</h1>
-    <p class="auth-subtitle" id="authSubtitle">Access your Biziqoo account and dashboard.</p>
-
-    <!-- Tab Switcher -->
-    <div class="tab-group">
-      <button class="tab-btn active" id="loginTab" type="button">Log in</button>
-      <button class="tab-btn" id="signupTab" type="button">Create account</button>
+    <!-- SPLASH SCREEN -->
+    <div id="splash-screen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-gradient-to-br from-white to-gray-200">
+        <img src="assets/name.png" alt="CMB" class="w-48 h-16 object-contain aspect-[3/1] animate-pulse" onerror="this.src='https://via.placeholder.com/150x50?text=CMB'">
+        <div class="mt-6 flex gap-1">
+            <div class="w-2 h-2 bg-brand-600 rounded-full animate-bounce" style="animation-delay: 0s;"></div>
+            <div class="w-2 h-2 bg-brand-600 rounded-full animate-bounce" style="animation-delay: 0.2s;"></div>
+            <div class="w-2 h-2 bg-brand-600 rounded-full animate-bounce" style="animation-delay: 0.4s;"></div>
+        </div>
     </div>
 
-    <div class="message-box" id="messageBox"></div>
-
-    <form class="form-group" id="authForm">
-      
-      <!-- Signup extra fields -->
-      <div class="field signup-extra">
-        <label for="fullName">Full name</label>
-        <div class="input-container">
-          <input type="text" id="fullName" placeholder="Jane Doe">
+    <!-- NAVBAR -->
+    <nav class="w-full relative z-20 px-6 py-4 flex justify-between items-center max-w-7xl mx-auto">
+        <div class="flex items-center gap-3">
+            <img src="assets/logo-cm-light.png" alt="CMB" class="w-36 h-12 object-contain aspect-[3/1]" onerror="this.src='https://via.placeholder.com/150x50?text=CMB'">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest hidden md:block pl-3 border-l border-slate-300">Workspace Portal</span>
         </div>
-      </div>
+        <a href="https://cmfilings.com" target="_blank" class="text-sm font-semibold text-slate-500 hover:text-brand-600 flex items-center gap-2 transition-colors">
+            <i data-lucide="life-buoy" class="w-4 h-4"></i> CMB Support
+        </a>
+    </nav>
 
-      <div class="field signup-extra">
-        <label for="businessName">Business name</label>
-        <div class="input-container">
-          <input type="text" id="businessName" placeholder="Acme Corporation">
+    <!-- MAIN CONTENT & LOGIN FORM -->
+    <main class="flex-grow flex flex-col justify-center items-center px-4 relative z-10 w-full max-w-5xl mx-auto text-center py-10 md:py-16">
+        
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-50 text-brand-600 font-semibold text-sm mb-6 border border-brand-100">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-500 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-600"></span>
+            </span>
+            System Online & Ready
         </div>
-      </div>
+        
+        <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight tracking-tight mb-8">
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-blue-400">CMB Business Flow</span>
+        </h1>
 
-      <!-- Email Field -->
-      <div class="field">
-        <label for="email">Email address</label>
-        <div class="input-container">
-          <input type="email" id="email" placeholder="name@domain.com" required autocomplete="email">
+        <!-- AUTHENTICATION BOX -->
+        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-xl w-full max-w-md mx-auto text-left relative overflow-hidden">
+            
+            <!-- Login Form -->
+            <div id="login-form-box">
+                <div class="flex flex-col items-center mb-6">
+                    <img src="assets/name.png" alt="Stra Care" class="h-10 object-contain mb-2" onerror="this.src='https://via.placeholder.com/150x50?text=STRA+CARE'">
+                    <h2 class="text-xl font-bold text-slate-800">Workspace Login</h2>
+                </div>
+
+                <input type="email" id="loginEmail" placeholder="Email Address" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-brand-600 focus:ring-2 focus:ring-brand-100 outline-none transition-all mb-4 text-sm text-slate-700">
+                
+                <div class="relative mb-2">
+                    <input type="password" id="loginPassword" placeholder="Password" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-brand-600 focus:ring-2 focus:ring-brand-100 outline-none transition-all text-sm text-slate-700 pr-10" onkeypress="if(event.key === 'Enter') window.handleLogin()">
+                    <i data-lucide="eye-off" id="togglePassIcon" onclick="window.togglePassword()" class="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 cursor-pointer hover:text-slate-600"></i>
+                </div>
+
+                <div class="text-right mb-6">
+                    <span onclick="window.toggleResetView(true)" class="text-brand-600 text-xs font-semibold cursor-pointer hover:underline">Forgot Password?</span>
+                </div>
+
+                <div class="flex items-center gap-2 mb-6">
+                    <input type="checkbox" id="rememberMe" class="w-4 h-4 text-brand-600 rounded border-slate-300 focus:ring-brand-500 cursor-pointer">
+                    <label for="rememberMe" class="text-xs font-medium text-slate-500 cursor-pointer">Remember me on this browser</label>
+                </div>
+
+                <button id="loginBtn" onclick="window.handleLogin()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl transition-all shadow-[0_4px_14px_0_rgba(0,82,204,0.39)] hover:shadow-[0_6px_20px_rgba(0,82,204,0.23)] hover:-translate-y-0.5 text-sm flex justify-center items-center gap-2">
+                    Access Dashboard <i data-lucide="log-in" class="w-4 h-4"></i>
+                </button>
+                <div id="login-error" class="text-red-500 text-xs font-semibold mt-3 text-center hidden">Authentication Failed.</div>
+            </div>
+
+            <!-- Reset Password Form -->
+            <div id="reset-form-box" class="hidden">
+                <h2 class="text-xl font-bold text-slate-800 text-center mb-2">Reset Password</h2>
+                <p class="text-slate-500 text-xs text-center mb-6">Enter your registered email address and we will send you a link to reset your password.</p>
+                
+                <input type="email" id="resetEmail" placeholder="Email Address" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-brand-600 focus:ring-2 focus:ring-brand-100 outline-none transition-all mb-6 text-sm text-slate-700">
+                
+                <button id="resetBtn" onclick="window.handlePasswordReset()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl transition-all text-sm mb-4">Send Reset Link</button>
+                
+                <div id="reset-msg" class="text-xs font-semibold text-center mb-4"></div>
+
+                <div class="text-center">
+                    <span onclick="window.toggleResetView(false)" class="text-slate-500 text-xs font-semibold cursor-pointer hover:text-slate-800 flex items-center justify-center gap-1">
+                        <i data-lucide="arrow-left" class="w-3 h-3"></i> Back to Login
+                    </span>
+                </div>
+            </div>
+
         </div>
-      </div>
+    </main>
 
-      <!-- Password Field -->
-      <div class="field">
-        <label for="password">Password</label>
-        <div class="input-container">
-          <input type="password" id="password" placeholder="••••••••" required minlength="8" autocomplete="current-password">
-          <button type="button" class="toggle-pwd" id="togglePasswordBtn" aria-label="Toggle password visibility">
-            <svg id="eyeIcon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
-        </div>
-      </div>
+    <footer class="w-full relative z-20 py-6 border-t border-slate-200 bg-white/80 backdrop-blur-md text-center mt-auto">
+        <p class="text-sm font-medium text-slate-500">
+            &copy; <script>document.write(new Date().getFullYear())</script> <strong class="text-slate-800">CMB Business Flow Application</strong>. All rights reserved.
+        </p>
+    </footer>
 
-      <!-- Password Confirmation for Signup -->
-      <div class="field signup-extra">
-        <label for="confirmPassword">Confirm password</label>
-        <div class="input-container">
-          <input type="password" id="confirmPassword" placeholder="••••••••">
-        </div>
-      </div>
+    <!-- FIREBASE AUTHENTICATION SCRIPTS -->
+    <script type="module">
+        import { auth } from './firebase-config.js';
+        import { signInWithEmailAndPassword, onAuthStateChanged, setPersistence, browserLocalPersistence, browserSessionPersistence, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-      <!-- Remember Me & Forgot Password Row -->
-      <div class="form-options" id="loginOptions">
-        <label class="remember-me">
-          <input type="checkbox" id="rememberCheck" checked> Remember me
-        </label>
-        <a href="#" class="forgot-pwd" id="forgotBtn">Forgot password?</a>
-      </div>
+        // If user is already logged in, redirect them directly to index.html
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                window.location.href = 'index.html';
+            }
+        });
 
-      <!-- Terms Checkbox for Signup -->
-      <label class="remember-me signup-extra" id="termsGroup">
-        <input type="checkbox" id="termsCheck"> I agree to the <a href="#" style="color:var(--hostinger-purple)">Terms & Conditions</a>
-      </label>
+        // UI Toggles
+        window.toggleResetView = function(showReset) {
+            document.getElementById('login-form-box').style.display = showReset ? 'none' : 'block';
+            document.getElementById('reset-form-box').style.display = showReset ? 'block' : 'none';
+            document.getElementById('reset-msg').innerText = ''; 
+            if (showReset) document.getElementById('resetEmail').value = document.getElementById('loginEmail').value;
+        };
 
-      <!-- Primary Action Button -->
-      <button type="submit" class="btn-primary" id="submitBtn">Log in</button>
-    </form>
+        window.togglePassword = function() {
+            const passInput = document.getElementById('loginPassword');
+            const passIcon = document.getElementById('togglePassIcon');
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                passIcon.setAttribute('data-lucide', 'eye');
+            } else {
+                passInput.type = 'password';
+                passIcon.setAttribute('data-lucide', 'eye-off');
+            }
+            lucide.createIcons();
+        };
 
-    <div class="divider"><span>OR</span></div>
+        // Auth Functions
+        window.handleLogin = async function() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            const rememberMe = document.getElementById('rememberMe').checked;
+            const errDiv = document.getElementById('login-error');
+            const loginBtn = document.getElementById('loginBtn');
 
-    <!-- Social Authentication -->
-    <div class="social-buttons">
-      <button type="button" class="btn-social" id="googleBtn">
-        <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3h3.88c2.27-2.09 3.665-5.17 3.665-9.12z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3c-1.08.72-2.45 1.16-4.05 1.16-3.1 0-5.73-2.1-6.67-4.93H1.32v3.08C3.3 21.3 7.37 24 12 24z"/><path fill="#FBBC05" d="M5.33 14.32a7.18 7.18 0 0 1 0-4.64V6.6H1.32a11.96 11.96 0 0 0 0 10.8l4.01-3.08z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.3 2.7 1.32 6.6l4.01 3.08c.94-2.83 3.57-4.93 6.67-4.93z"/></svg>
-        Continue with Google
-      </button>
-    </div>
+            if (!email || !password) {
+                errDiv.innerText = "Please enter both email and password.";
+                errDiv.style.display = 'block';
+                return;
+            }
 
-    <p class="legal-text">
-      By continuing, you agree to Biziqoo's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
-    </p>
-  </main>
+            loginBtn.innerHTML = "Authenticating... <i data-lucide='loader-2' class='w-4 h-4 animate-spin'></i>";
+            lucide.createIcons();
+            loginBtn.disabled = true;
+            errDiv.style.display = 'none';
 
-  <footer class="footer-nav">
-    <a href="https://biziqoo.com">← Back to biziqoo.com</a>
-  </footer>
+            try {
+                const persistenceType = rememberMe ? browserLocalPersistence : browserSessionPersistence;
+                await setPersistence(auth, persistenceType);
+                await signInWithEmailAndPassword(auth, email, password);
+                // The onAuthStateChanged listener above will handle the redirect upon success
+            } catch (error) {
+                errDiv.innerText = "Invalid credentials or user not found.";
+                errDiv.style.display = 'block';
+                loginBtn.innerHTML = "Access Dashboard <i data-lucide='log-in' class='w-4 h-4'></i>";
+                lucide.createIcons();
+                loginBtn.disabled = false;
+            }
+        };
 
-</div>
+        window.handlePasswordReset = async function() {
+            const email = document.getElementById('resetEmail').value.trim();
+            const msgDiv = document.getElementById('reset-msg');
+            const resetBtn = document.getElementById('resetBtn');
 
-<script>
-const $ = id => document.getElementById(id);
-let mode = "login";
+            if (!email) {
+                msgDiv.innerText = "Please enter your email address.";
+                msgDiv.className = "text-xs font-semibold text-center mb-4 text-red-500";
+                return;
+            }
 
-function setMode(nextMode) {
-  mode = nextMode;
-  const isSignup = mode === "signup";
-  
-  $("loginTab").classList.toggle("active", !isSignup);
-  $("signupTab").classList.toggle("active", isSignup);
-  
-  document.querySelectorAll(".signup-extra").forEach(el => {
-    el.style.display = isSignup ? (el.tagName === 'LABEL' ? 'flex' : 'flex') : "none";
-  });
-  
-  $("loginOptions").style.display = isSignup ? "none" : "flex";
-  $("authTitle").textContent = isSignup ? "Create account" : "Log in";
-  $("authSubtitle").textContent = isSignup 
-    ? "Get started with your connected Biziqoo workspace." 
-    : "Access your Biziqoo account and dashboard.";
-  $("submitBtn").textContent = isSignup ? "Create account" : "Log in";
-  $("password").setAttribute("autocomplete", isSignup ? "new-password" : "current-password");
-  $("messageBox").style.display = "none";
-}
+            resetBtn.innerText = "Sending...";
+            resetBtn.disabled = true;
 
-$("loginTab").onclick = () => setMode("login");
-$("signupTab").onclick = () => setMode("signup");
+            try {
+                await sendPasswordResetEmail(auth, email);
+                msgDiv.innerText = "Reset link sent! Please check your inbox.";
+                msgDiv.className = "text-xs font-semibold text-center mb-4 text-emerald-500";
+            } catch (error) {
+                msgDiv.innerText = "Error: Could not send reset link. Verify email.";
+                msgDiv.className = "text-xs font-semibold text-center mb-4 text-red-500";
+            } finally {
+                resetBtn.innerText = "Send Reset Link";
+                resetBtn.disabled = false;
+            }
+        };
 
-$("togglePasswordBtn").onclick = () => {
-  const pwdInput = $("password");
-  const isSecret = pwdInput.type === "password";
-  pwdInput.type = isSecret ? "text" : "password";
-  $("eyeIcon").innerHTML = isSecret
-    ? '<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/>'
-    : '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>';
-};
-
-$("forgotBtn").onclick = e => {
-  e.preventDefault();
-  $("messageBox").textContent = "Password reset link sent! Check your inbox.";
-  $("messageBox").style.display = "block";
-};
-
-$("googleBtn").onclick = () => {
-  $("messageBox").textContent = "Redirecting to Google Sign-In...";
-  $("messageBox").style.display = "block";
-};
-
-$("authForm").onsubmit = e => {
-  e.preventDefault();
-  if (mode === "signup" && $("password").value !== $("confirmPassword").value) {
-    $("messageBox").textContent = "Passwords do not match.";
-    $("messageBox").style.display = "block";
-    return;
-  }
-  $("messageBox").textContent = mode === "signup" ? "Account created successfully!" : "Signing in...";
-  $("messageBox").style.display = "block";
-};
-</script>
-
+        // Splash Screen Logic
+        const removeSplash = () => {
+            const splash = document.getElementById('splash-screen');
+            if (splash && !splash.classList.contains('fade-out')) {
+                splash.classList.add('fade-out');
+                setTimeout(() => splash.remove(), 600);
+            }
+        };
+        window.addEventListener('load', () => setTimeout(removeSplash, 800));
+        setTimeout(removeSplash, 2000);
+        
+        document.addEventListener('DOMContentLoaded', () => lucide.createIcons());
+    </script>
 </body>
 </html>

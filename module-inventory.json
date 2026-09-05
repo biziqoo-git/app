@@ -1,0 +1,119 @@
+{
+  "source": "client-main (3).zip",
+  "platform": "biziqoo",
+  "module_files": [
+    "patients.html",
+    "bank.html",
+    "login.html",
+    "attendance.html",
+    "temp-invoice.html",
+    "updates.html",
+    "payments.html",
+    "branches.html",
+    "appointments.html",
+    "letterhead.html",
+    "transaction.html",
+    "company.html",
+    "receipt.html",
+    "therapist.html",
+    "backup.html",
+    "users.html",
+    "privacy.html",
+    "staff.html",
+    "qr.html",
+    "seal.html",
+    "ledgers.html",
+    "calc.html",
+    "aboutapp.html",
+    "invoice.html",
+    "cash.html",
+    "estimate.html"
+  ],
+  "firestore_collections_by_file": {
+    "patients.html": [
+      "branches",
+      "patients"
+    ],
+    "bank.html": [
+      "branches",
+      "patients",
+      "transactions"
+    ],
+    "attendance.html": [
+      "branches",
+      "therapists",
+      "staff",
+      "leave_requests",
+      "daily_attendance"
+    ],
+    "payments.html": [
+      "branches",
+      "transactions"
+    ],
+    "branches.html": [
+      "branches"
+    ],
+    "appointments.html": [
+      "patients",
+      "branches",
+      "therapists",
+      "appointments",
+      "transactions",
+      "settings"
+    ],
+    "index.html": [
+      "appointments",
+      "daily_attendance",
+      "users"
+    ],
+    "transaction.html": [
+      "branches",
+      "patients",
+      "transactions"
+    ],
+    "company.html": [
+      "settings"
+    ],
+    "receipt.html": [
+      "branches",
+      "patients",
+      "transactions"
+    ],
+    "therapist.html": [
+      "branches",
+      "therapists"
+    ],
+    "users.html": [
+      "users"
+    ],
+    "staff.html": [
+      "branches",
+      "staff"
+    ],
+    "qr.html": [
+      "patients",
+      "appointments"
+    ],
+    "ledgers.html": [
+      "ledger_categories",
+      "ledgers"
+    ],
+    "cash.html": [
+      "branches",
+      "patients",
+      "transactions"
+    ],
+    "estimate.html": [
+      "branches",
+      "estimates"
+    ]
+  },
+  "document_number_observations": {
+    "patients": "patientId is generated as P + five random digits in appointments import/new-patient flow.",
+    "appointments": "appointmentId is represented by the Firestore appointment document id when generating invoice payload.",
+    "invoices": "billNo/invoiceNo are supported by temp-invoice; fallback is INV- + last six digits of Date.now().",
+    "estimates": "estimates collection exists; no universal estimateNo field was found in the supplied source.",
+    "receipts": "transactions collection is used; no universal receiptNo field was found in the supplied source.",
+    "transactions": "transactions collection uses Firestore document ids; no universal transactionNo field was found in the supplied source."
+  }
+}

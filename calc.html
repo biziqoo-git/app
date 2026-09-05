@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>CM Calc</title>
+<link rel="icon" type="image/png" href="assets/logo-cm.png">
+<link rel="apple-touch-icon" href="assets/logo-cm.png">
+<meta name="theme-color" content="#1a1b1c">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root[data-theme="dark"]{--bg:#1a1b1c;--header:#e0e0e0;--screen:linear-gradient(180deg,#0f282f,#12333b);--st:#fff;--muted:#5e848d;--sb:#000;--div:#264a52;--border:#050505;--shadow:inset 0 1px 1px #ffffff1a,0 3px 6px #0009;--num:linear-gradient(#333435,#1e1e1f);--nt:#b3b3b3;--mem:linear-gradient(#363636,#262626);--mt:#909090;--op:linear-gradient(#325a74,#1f4258);--ot:#fff;--red:linear-gradient(#c2463b,#9c2e25);--rt:#fff;--orange:linear-gradient(#e29033,#c16e15);--or:#000}
+:root[data-theme="light"]{--bg:#e4e6e8;--header:#111;--screen:linear-gradient(#a4c1cf,#89adb9);--st:#111;--muted:#3a545e;--sb:#6c7d85;--div:#7598a6;--border:#99a2a8;--shadow:inset 0 1px 2px #fff,0 2px 4px #0004;--num:linear-gradient(#f2f2f2,#d8d8d8);--nt:#111;--mem:linear-gradient(#a7b2c2,#8b97a8);--mt:#fff;--op:linear-gradient(#dce4ee,#b8c6d8);--ot:#111;--red:linear-gradient(#ef8a7a,#db5b4a);--rt:#111;--orange:linear-gradient(#fac680,#ee9941);--or:#111}
+*{box-sizing:border-box;font-family:Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;height:100dvh;overflow:hidden}
+body{background:var(--bg);display:flex;justify-content:center;padding:10px}
+.calc{width:100%;max-width:400px;height:100%;display:flex;flex-direction:column;gap:8px}
+.top{height:40px;flex:0 0 40px;display:flex;align-items:center;justify-content:space-between}
+.logo{width:32px;height:32px;object-fit:contain}
+.title{flex:1;text-align:center;color:var(--header);font-size:17px;font-weight:500}
+.theme{width:34px;height:34px;border:1px solid var(--border);border-radius:7px;background:var(--num);color:var(--nt);font-size:17px}
+.display{flex:0 0 140px;min-height:140px;background:var(--screen);border:2px solid var(--sb);border-radius:6px;box-shadow:inset 0 4px 12px #0004;padding:12px 14px;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+.result{width:100%;text-align:right;color:var(--st);font-size:clamp(42px,12vw,52px);line-height:1;font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.divider{border-top:1px solid var(--div);margin:10px 0 5px}.expression{min-height:28px;text-align:right;color:var(--muted);font-size:21px;font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.keys{flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:.72fr repeat(5,1fr);gap:7px}
+.key{min-height:0;border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;touch-action:manipulation;box-shadow:var(--shadow);font-weight:500}
+.key:active{transform:translateY(2px);filter:brightness(.9);box-shadow:inset 0 2px 6px #0006}
+.num{background:var(--num);color:var(--nt);font-size:clamp(30px,8vw,36px)}.mem{background:var(--mem);color:var(--mt);font-size:20px}.op{background:var(--op);color:var(--ot);font-size:clamp(30px,8vw,36px)}.red{background:var(--red);color:var(--rt);font-size:clamp(30px,8vw,36px)}.orange{background:var(--orange);color:var(--or);font-size:clamp(30px,8vw,36px);font-weight:700}.back svg{width:30px;height:30px}
+@media(max-height:600px){body{padding:6px}.calc{gap:5px}.top{height:34px;flex-basis:34px}.logo{width:27px;height:27px}.theme{width:30px;height:30px}.display{flex-basis:105px;min-height:105px;padding:8px 12px}.divider{margin:6px 0 3px}.expression{font-size:17px;min-height:22px}.keys{gap:5px}}
+</style>
+</head>
+<body>
+<main class="calc">
+<header class="top">
+<img class="logo" src="assets/logo-cm.png" alt="CM">
+<div class="title">CM Calc</div>
+<button class="theme" id="themeBtn" onclick="toggleTheme()">☀</button>
+</header>
+<section class="display">
+<div id="result" class="result">0</div><div class="divider"></div><div id="expression" class="expression">&nbsp;</div>
+</section>
+<section class="keys">
+<button class="key mem" onclick="mem('mc')">mc</button><button class="key mem" onclick="mem('m+')">m+</button><button class="key mem" onclick="mem('m-')">m-</button><button class="key mem" onclick="mem('mr')">mr</button>
+<button class="key red" onclick="calc('C')">C</button><button class="key num" onclick="calc('%')">%</button><button class="key num" onclick="calc('+/-')">+/−</button><button class="key op" onclick="calc('/')">÷</button>
+<button class="key num" onclick="calc('7')">7</button><button class="key num" onclick="calc('8')">8</button><button class="key num" onclick="calc('9')">9</button><button class="key op" onclick="calc('*')">×</button>
+<button class="key num" onclick="calc('4')">4</button><button class="key num" onclick="calc('5')">5</button><button class="key num" onclick="calc('6')">6</button><button class="key op" onclick="calc('-')">−</button>
+<button class="key num" onclick="calc('1')">1</button><button class="key num" onclick="calc('2')">2</button><button class="key num" onclick="calc('3')">3</button><button class="key op" onclick="calc('+')">+</button>
+<button class="key num" onclick="calc('0')">0</button><button class="key num" onclick="calc('.')">.</button>
+<button class="key num back" onclick="calc('back')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 3H7c-.7 0-1.3.4-1.6 1L0 12l5.4 8c.3.6.9 1 1.6 1h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm-3.7 13.3-2.8-2.8-2.8 2.8-1.4-1.4 2.8-2.8-2.8-2.8 1.4-1.4 2.8 2.8 2.8-2.8 1.4 1.4-2.8 2.8 2.8 2.8-1.4 1.4Z"/></svg></button>
+<button class="key orange" onclick="calc('=')">=</button>
+</section>
+</main>
+<script>
+let current='0',prev='',op='',reset=false,memory=0;
+const resultEl=document.getElementById('result'),exprEl=document.getElementById('expression');
+function fmt(n){n=parseFloat(n);return Number.isFinite(n)?n.toLocaleString('en-US',{maximumFractionDigits:8}):'Error'}
+function update(){resultEl.textContent=current.endsWith('.')?fmt(current.slice(0,-1))+'.':current.includes('.')&&current.endsWith('0')?current:fmt(current)}
+function operate(a,b,o){if(o==='+')return a+b;if(o==='-')return a-b;if(o==='*')return a*b;if(o==='/')return b===0?NaN:a/b}
+function calc(k){
+if(k==='C'){current='0';prev='';op='';reset=false;exprEl.innerHTML='&nbsp;'}
+else if(k==='+/-')current=String(-(parseFloat(current)||0))
+else if(k==='%')current=String((parseFloat(current)||0)/100)
+else if(k==='back'){current=current.length>1?current.slice(0,-1):'0';if(current==='-')current='0'}
+else if(['+','-','*','/'].includes(k)){if(op&&prev&&!reset)current=String(operate(+prev,+current,op));prev=current;op=k;exprEl.textContent=fmt(prev)+' '+({'+':'+','-':'−','*':'×','/':'÷'}[k]);reset=true}
+else if(k==='='){if(op&&prev){exprEl.textContent=fmt(prev)+' '+({'+':'+','-':'−','*':'×','/':'÷'}[op])+' '+fmt(current);current=String(operate(+prev,+current,op));prev='';op='';reset=true}}
+else{if(reset){current='';reset=false}if(k==='.'&&current.includes('.'))return;current=current==='0'&&k!=='.'?k:current+k}
+update()
+}
+function mem(k){if(k==='mc')memory=0;else if(k==='m+')memory+=(+current||0),reset=true;else if(k==='m-')memory-=(+current||0),reset=true;else if(k==='mr'){current=String(memory);reset=false;update()}}
+let dark=true;function toggleTheme(){dark=!dark;document.documentElement.dataset.theme=dark?'dark':'light';document.getElementById('themeBtn').textContent=dark?'☀':'☾'}
+document.addEventListener('keydown',e=>{const m={Enter:'=',Escape:'C',Backspace:'back'};if(m[e.key]){e.preventDefault();calc(m[e.key])}else if('0123456789.+-*/%'.includes(e.key)){e.preventDefault();calc(e.key)}});update()
+</script>
+</body>
+</html>

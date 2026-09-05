@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Professional GST Tax Invoice Generator</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- html2pdf.js for High Quality PDF Export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- Inter Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f1f5f9;
+      color: #1e293b;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Multi-page capable A4 container */
+    .invoice-paper {
+      width: 210mm;
+      min-height: 297mm;
+      height: auto;
+      background: white;
+      margin: 0 auto 30px auto;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    /* Print & PDF Page Break Rules */
+    .pdf-avoid-break {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+    }
+
+    tr {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+    }
+
+    thead {
+      display: table-header-group;
+    }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 8mm 6mm;
+      }
+      body {
+        background: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .invoice-paper {
+        width: 100% !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      input, textarea, select {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        outline: none !important;
+        resize: none !important;
+      }
+    }
+
+    /* Clean input styling */
+    .inv-input {
+      background: transparent;
+      transition: all 0.15s;
+    }
+    .inv-input:focus {
+      background: #f8fafc;
+      outline: 1.5px solid #4f46e5;
+      border-radius: 3px;
+    }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="p-2 sm:p-4 lg:p-6">
+
+  <!-- TOP APP ACTION BAR (no-print) -->
+  <header class="no-print max-w-[210mm] mx-auto mb-4 bg-white rounded-xl shadow-xs border border-slate-200 p-3 sticky top-2 z-40">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="p-1.5 bg-indigo-600 text-white rounded-lg">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+        </span>
+        <div>
+          <h1 class="text-sm font-bold text-slate-900 leading-tight">GST Tax Invoice Studio</h1>
+          <p class="text-[10px] text-slate-500">Supports unlimited items &bull; Auto Multi-Page PDF &bull; Kerala GST (32)</p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-wrap items-center gap-1.5">
+        <!-- Density Toggle -->
+        <button onclick="toggleDensity()" id="densityBtn" class="px-2.5 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition flex items-center gap-1" title="Toggle Compact / Standard row spacing">
+          <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+          <span id="densityLabel">Compact View</span>
+        </button>
+
+        <!-- Sample CSV -->
+        <button onclick="downloadSampleCSV()" class="px-2.5 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition flex items-center gap-1">
+          <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          Sample CSV
+        </button>
+
+        <!-- Import CSV -->
+        <label class="px-2.5 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition cursor-pointer flex items-center gap-1">
+          <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+          Import CSV
+          <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleCSVUpload(event)" />
+        </label>
+
+        <!-- Paste Excel -->
+        <button onclick="openPasteModal()" class="px-2.5 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition flex items-center gap-1">
+          <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+          Paste Excel
+        </button>
+
+        <!-- Tax Type Toggle -->
+        <div class="flex items-center bg-slate-100 rounded-lg p-0.5 text-xs">
+          <button id="btnIntra" onclick="setTaxType('intra')" class="px-2 py-1 rounded font-medium text-white bg-indigo-600 transition text-[11px]">CGST+SGST</button>
+          <button id="btnInter" onclick="setTaxType('inter')" class="px-2 py-1 rounded font-medium text-slate-600 hover:text-slate-900 transition text-[11px]">IGST</button>
+        </div>
+
+        <!-- Print -->
+        <button onclick="window.print()" class="px-2.5 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 rounded-lg transition flex items-center gap-1">
+          <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+          Print
+        </button>
+
+        <!-- Download PDF -->
+        <button onclick="downloadPDF()" id="pdfBtn" class="px-3 py-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-xs transition flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          Download PDF
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN INVOICE CONTAINER -->
+  <main id="invoiceElement" class="invoice-paper p-5 sm:p-6 rounded-lg border border-slate-200 flex flex-col justify-between">
+    
+    <div>
+      <!-- TOP HEADER: LOGO + COMPANY DETAILS + INVOICE METADATA -->
+      <div class="pdf-avoid-break flex justify-between items-start gap-3 border-b border-slate-300 pb-2.5">
+        
+        <!-- Left: Logo & Company Info (HEXA SUPER MARKET) -->
+        <div class="flex gap-2.5 items-start max-w-[62%]">
+          <!-- Logo Box -->
+          <div class="relative group w-14 h-14 bg-slate-50 border border-dashed border-slate-300 rounded-lg flex flex-col items-center justify-center cursor-pointer overflow-hidden flex-shrink-0 hover:border-indigo-400 transition" onclick="document.getElementById('logoInput').click()">
+            <img id="companyLogoImg" src="" alt="Logo" class="w-full h-full object-contain hidden" />
+            <div id="logoPlaceholder" class="text-center p-1 text-slate-400 group-hover:text-indigo-600 transition">
+              <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+              <span class="text-[7.5px] block font-medium">Attach Logo</span>
+            </div>
+            <input type="file" id="logoInput" accept="image/*" class="hidden" onchange="loadLogo(event)" />
+            <button type="button" id="removeLogoBtn" onclick="removeLogo(event)" class="absolute top-0.5 right-0.5 bg-red-500 text-white rounded-full p-0.5 shadow-2xs hidden no-print" title="Remove logo">
+              <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+          </div>
+
+          <!-- Company Meta -->
+          <div class="space-y-0.5 flex-1 min-w-0">
+            <input type="text" id="compName" value="HEXA SUPER MARKET" class="inv-input font-extrabold text-sm sm:text-base text-slate-900 w-full px-0.5 uppercase tracking-tight" placeholder="YOUR COMPANY NAME" />
+            <textarea id="compAddress" rows="2" class="inv-input text-[10px] text-slate-600 w-full px-0.5 resize-none leading-snug" placeholder="Registered Office Address">9/53, 61,52,51,50,49,48,47,46,45,54,55,56,57,58, 61,52 Mammi Mukku, Peringadi, Kannur, Kerala, 673312</textarea>
+            <div class="grid grid-cols-2 gap-x-1.5 text-[9.5px] text-slate-700 pt-0.5">
+              <div><span class="font-bold text-slate-900">GSTIN:</span> <input type="text" id="compGST" value="32AANFH1221PIZD" class="inv-input uppercase font-semibold text-slate-900 w-28 px-0.5" /></div>
+              <div><span class="font-bold text-slate-900">PAN:</span> <input type="text" id="compPAN" value="AANFH1221P" class="inv-input uppercase font-semibold text-slate-800 w-24 px-0.5" /></div>
+              <div><span class="font-bold text-slate-900">Phone:</span> <input type="text" id="compPhone" value="+91 95264 46685" class="inv-input text-slate-700 w-28 px-0.5" /></div>
+              <div><span class="font-bold text-slate-900">State:</span> <input type="text" id="compState" value="Kerala (Code: 32)" class="inv-input text-slate-700 w-28 px-0.5" /></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Invoice Badge & Details -->
+        <div class="w-[36%] text-right flex flex-col items-end">
+          <div class="inline-block bg-slate-900 text-white font-bold px-3 py-0.5 rounded text-xs tracking-wider uppercase">
+            TAX INVOICE
+          </div>
+          <div class="text-[8.5px] text-slate-500 font-medium uppercase mt-0.5">ORIGINAL FOR RECIPIENT</div>
+
+          <div class="mt-1 w-full bg-slate-50/80 rounded border border-slate-200 p-1.5 text-[10px] space-y-0.5">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-500 font-medium">Invoice No:</span>
+              <input type="text" id="invNo" value="INV-2026-0042" class="inv-input font-bold text-slate-900 text-right w-28 px-0.5" />
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-500 font-medium">Invoice Date:</span>
+              <div class="flex items-center">
+                <input type="text" id="invDateDisplay" class="inv-input font-semibold text-slate-800 text-right w-24 px-0.5 cursor-pointer" onclick="document.getElementById('invDateInput').showPicker ? document.getElementById('invDateInput').showPicker() : document.getElementById('invDateInput').focus()" />
+                <input type="date" id="invDateInput" class="opacity-0 w-0 h-0 absolute pointer-events-none" onchange="syncDate('invDateInput', 'invDateDisplay')" />
+              </div>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-500 font-medium">Due Date:</span>
+              <div class="flex items-center">
+                <input type="text" id="dueDateDisplay" class="inv-input font-semibold text-slate-800 text-right w-24 px-0.5 cursor-pointer" onclick="document.getElementById('dueDateInput').showPicker ? document.getElementById('dueDateInput').showPicker() : document.getElementById('dueDateInput').focus()" />
+                <input type="date" id="dueDateInput" class="opacity-0 w-0 h-0 absolute pointer-events-none" onchange="syncDate('dueDateInput', 'dueDateDisplay')" />
+              </div>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-500 font-medium">Place of Supply:</span>
+              <input type="text" id="placeOfSupply" value="32-Kerala" class="inv-input font-semibold text-slate-800 text-right w-24 px-0.5" />
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-500 font-medium">PO Number:</span>
+              <input type="text" id="poNumber" value="PO/2026/891" class="inv-input text-slate-700 text-right w-24 px-0.5" />
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- PARTIES SECTION: BILLED TO & SHIPPED TO -->
+      <div class="pdf-avoid-break grid grid-cols-2 gap-2.5 my-2">
+        <!-- Billed To -->
+        <div class="border border-slate-300 rounded-lg p-2 bg-white">
+          <div class="text-[9px] font-bold text-indigo-700 uppercase tracking-wider mb-0.5 flex items-center gap-1">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            Billed To (Client / Customer)
+          </div>
+          <input type="text" id="billToName" value="CEA TRADING" class="inv-input font-bold text-xs text-slate-900 w-full px-0.5 uppercase" placeholder="Client Company Name" />
+          <textarea id="billToAddress" rows="1" class="inv-input text-[9.5px] text-slate-600 w-full px-0.5 resize-none leading-snug" placeholder="Billing Address">EPA TOWER CHOKLI, KANNUR - 670672</textarea>
+          
+          <div class="grid grid-cols-2 gap-x-1 text-[9.5px] mt-0.5">
+            <div><span class="text-slate-500 font-medium">GSTIN:</span> <input type="text" id="billToGST" value="32AAFFC8477N1ZY" class="inv-input uppercase font-semibold text-slate-800 w-24 px-0.5" /></div>
+            <div><span class="text-slate-500 font-medium">PAN:</span> <input type="text" id="billToPAN" value="AAFFC8477N" class="inv-input uppercase font-semibold text-slate-800 w-20 px-0.5" /></div>
+            <div><span class="text-slate-500 font-medium">State:</span> <input type="text" id="billToState" value="KERALA CODE : 32" class="inv-input text-slate-700 w-28 px-0.5" /></div>
+            <div><span class="text-slate-500 font-medium">Phone:</span> <input type="text" id="billToPhone" value="04902330174 / 9048990949" class="inv-input text-slate-700 w-28 px-0.5" /></div>
+          </div>
+        </div>
+
+        <!-- Shipped To -->
+        <div class="border border-slate-300 rounded-lg p-2 bg-white">
+          <div class="flex justify-between items-center mb-0.5">
+            <div class="text-[9px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+              <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+              Shipped To (Consignee)
+            </div>
+            <button type="button" onclick="copyBillingToShipping()" class="no-print text-[8.5px] text-indigo-600 hover:text-indigo-800 font-medium underline">Same as Billed To</button>
+          </div>
+          <input type="text" id="shipToName" value="CEA TRADING" class="inv-input font-bold text-xs text-slate-900 w-full px-0.5 uppercase" placeholder="Consignee Name" />
+          <textarea id="shipToAddress" rows="1" class="inv-input text-[9.5px] text-slate-600 w-full px-0.5 resize-none leading-snug" placeholder="Shipping Address">EPA TOWER CHOKLI, KANNUR - 670672</textarea>
+          
+          <div class="grid grid-cols-2 gap-x-1 text-[9.5px] mt-0.5">
+            <div><span class="text-slate-500 font-medium">GSTIN:</span> <input type="text" id="shipToGST" value="32AAFFC8477N1ZY" class="inv-input uppercase font-semibold text-slate-800 w-24 px-0.5" /></div>
+            <div><span class="text-slate-500 font-medium">State:</span> <input type="text" id="shipToState" value="KERALA CODE : 32" class="inv-input text-slate-700 w-28 px-0.5" /></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ITEMS TABLE CONTAINER (EXPANDABLE) -->
+      <div class="border border-slate-300 rounded-lg overflow-hidden bg-white mb-3 shadow-2xs">
+        <table class="w-full text-left text-[10px] border-collapse" id="itemsTable">
+          <thead>
+            <tr class="bg-slate-900 text-white font-semibold uppercase tracking-wider text-[8.5px]">
+              <th class="py-1 px-1 text-center w-5">#</th>
+              <th class="py-1 px-1.5 min-w-[160px]">Item Description</th>
+              <th class="py-1 px-1 text-center w-16">HSN/SAC</th>
+              <th class="py-1 px-1 text-right w-10">Qty</th>
+              <th class="py-1 px-1 text-center w-10">Unit</th>
+              <th class="py-1 px-1 text-right w-16">Rate (₹)</th>
+              <th class="py-1 px-1 text-right w-10">Disc%</th>
+              <th class="py-1 px-1 text-right w-18">Taxable (₹)</th>
+              <th class="py-1 px-1 text-right w-10">GST%</th>
+              <th class="py-1 px-1 text-right w-16">GST (₹)</th>
+              <th class="py-1 px-1.5 text-right w-20">Total (₹)</th>
+              <th class="py-1 px-0.5 text-center w-7 no-print">Act</th>
+            </tr>
+          </thead>
+          <tbody id="invoiceItemsBody" class="divide-y divide-slate-200 font-medium text-slate-800">
+            <!-- Populated via JS -->
+          </tbody>
+        </table>
+
+        <!-- Table Controls Footer -->
+        <div class="no-print p-2 bg-slate-50 border-t border-slate-200 flex flex-wrap justify-between items-center gap-2">
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="addNewRow()" class="px-2.5 py-1 text-xs font-bold text-indigo-700 hover:text-indigo-900 bg-white border border-indigo-200 rounded-md shadow-2xs flex items-center gap-1 transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+              Add Item Row
+            </button>
+            <button type="button" onclick="addMultipleRows(5)" class="px-2 py-1 text-[11px] font-medium text-slate-600 hover:text-slate-900 bg-white border border-slate-200 rounded-md shadow-2xs">
+              +5 Rows
+            </button>
+            <button type="button" onclick="clearAllRows()" class="px-2 py-1 text-[11px] font-medium text-red-600 hover:text-red-800 bg-white border border-red-200 rounded-md shadow-2xs">
+              Clear All
+            </button>
+          </div>
+          <span class="text-[10px] text-slate-500 font-medium">Total Items: <strong id="itemCountDisplay" class="text-slate-800">0</strong></span>
+        </div>
+      </div>
+
+      <!-- CALCULATION & SUMMARY SECTION -->
+      <div id="summarySection" class="pdf-avoid-break grid grid-cols-12 gap-2.5 items-start mt-2">
+        
+        <!-- Left 7 Cols: Bank Details, Terms & Amount in Words -->
+        <div class="col-span-7 space-y-1.5 text-[9.5px]">
+          
+          <!-- Amount in Words -->
+          <div class="bg-indigo-50/70 border border-indigo-100 rounded-lg p-1.5">
+            <div class="text-[8.5px] font-bold text-indigo-900 uppercase tracking-wide">Total Amount In Words:</div>
+            <div id="amountInWords" class="text-[10px] font-bold text-indigo-950 mt-0.5 capitalize leading-tight">
+              Rupees Zero Only
+            </div>
+          </div>
+
+          <!-- Bank Details -->
+          <div class="border border-slate-200 rounded-lg p-1.5 bg-slate-50/50">
+            <div class="font-bold text-slate-900 uppercase text-[9px] mb-0.5 flex items-center gap-1">
+              <svg class="w-3 h-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+              Bank & Payment Details
+            </div>
+            <div class="grid grid-cols-2 gap-x-2 gap-y-0.5 text-slate-700">
+              <div class="flex justify-between">
+                <span class="text-slate-500 font-medium">Bank:</span>
+                <input type="text" id="bankName" value="Federal Bank Ltd" class="inv-input font-semibold text-right w-28 px-0.5" />
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500 font-medium">A/C No:</span>
+                <input type="text" id="bankAccNo" value="14280200012345" class="inv-input font-bold text-right w-30 px-0.5" />
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500 font-medium">IFSC:</span>
+                <input type="text" id="bankIFSC" value="FDRL0001428" class="inv-input uppercase font-semibold text-right w-28 px-0.5" />
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500 font-medium">Branch:</span>
+                <input type="text" id="bankBranch" value="Kannur, Kerala" class="inv-input text-right w-28 px-0.5" />
+              </div>
+              <div class="flex justify-between col-span-2 pt-0.5 border-t border-slate-200">
+                <span class="text-slate-500 font-medium">UPI ID:</span>
+                <input type="text" id="bankUPI" value="hexasupermarket@federal" class="inv-input font-semibold text-indigo-700 text-right w-36 px-0.5" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Terms -->
+          <div class="border border-slate-200 rounded-lg p-1.5 bg-white">
+            <div class="font-bold text-slate-900 uppercase text-[9px] mb-0.5">Terms & Conditions:</div>
+            <textarea id="termsConds" rows="2" class="inv-input text-[9px] text-slate-600 w-full px-0.5 resize-none leading-tight">1. Payment due within 15 days of invoice date.
+2. Goods once sold will not be taken back or exchanged. Subject to Kannur jurisdiction.</textarea>
+          </div>
+
+        </div>
+
+        <!-- Right 5 Cols: Financial Totals Breakdown -->
+        <div class="col-span-5 bg-slate-50 border border-slate-300 rounded-lg p-2 text-[10px] space-y-1">
+          
+          <!-- Taxable Subtotal -->
+          <div class="flex justify-between items-center text-slate-700">
+            <span class="font-medium">Total Taxable:</span>
+            <span class="font-bold text-slate-900">₹ <span id="summaryTaxable">0.00</span></span>
+          </div>
+
+          <!-- Tax Split Display -->
+          <div id="taxSplitContainer" class="space-y-0.5 pt-0.5 border-t border-slate-200 text-[9.5px]">
+            <!-- Dynamic Intra/Inter -->
+          </div>
+
+          <!-- Total GST -->
+          <div class="flex justify-between items-center text-slate-700">
+            <span class="font-medium">Total GST:</span>
+            <span class="font-semibold text-slate-900">₹ <span id="summaryGST">0.00</span></span>
+          </div>
+
+          <!-- Gross Total -->
+          <div class="flex justify-between items-center text-slate-900 font-bold pt-0.5 border-t border-slate-300">
+            <span>Invoice Total (Gross):</span>
+            <span class="text-indigo-900">₹ <span id="summaryGrossTotal">0.00</span></span>
+          </div>
+
+          <!-- Less Advance Received -->
+          <div class="flex justify-between items-center bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 text-amber-950 font-semibold">
+            <span class="text-[9.5px]">Less Advance:</span>
+            <div class="flex items-center gap-0.5">
+              <span>- ₹</span>
+              <input type="number" id="lessAdvance" value="0" min="0" step="0.01" class="inv-input font-bold text-right w-20 bg-white border border-amber-300 rounded px-1 text-slate-900 text-[10px]" oninput="calculateAll()" />
+            </div>
+          </div>
+
+          <!-- Round Off -->
+          <div class="flex justify-between items-center text-slate-600 text-[9px]">
+            <span>Round Off:</span>
+            <span class="font-medium">₹ <span id="summaryRoundOff">0.00</span></span>
+          </div>
+
+          <!-- Net Balance Due -->
+          <div class="flex justify-between items-center bg-indigo-900 text-white rounded-lg p-1.5 shadow-2xs">
+            <div>
+              <div class="text-[8.5px] uppercase font-bold tracking-wider text-indigo-200">Net Balance Due</div>
+            </div>
+            <div class="text-right">
+              <span class="text-xs sm:text-sm font-extrabold">₹ <span id="summaryNetDue">0.00</span></span>
+            </div>
+          </div>
+
+          <!-- Signatory Box -->
+          <div class="pt-1 text-center flex flex-col items-end">
+            <div class="text-[9px] font-bold text-slate-800 text-right mb-4 uppercase">
+              For <span id="signatoryCompName">HEXA SUPER MARKET</span>
+            </div>
+            <div class="w-32 border-b border-slate-400 border-dashed mb-0.5"></div>
+            <div class="text-[8.5px] font-semibold text-slate-600 text-right w-32">
+              Authorized Signatory
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- MANDATORY FOOTER (AT VERY BOTTOM OF INVOICE) -->
+    <footer class="pdf-avoid-break mt-6 pt-1.5 border-t border-slate-200 flex justify-between items-center text-[8.5px] text-slate-400">
+      <div>This is a computer generated invoice and does not require a physical seal.</div>
+      <div class="font-medium tracking-wide">
+        powered by <span class="font-semibold text-slate-500">BizOdit</span>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- MODAL: PASTE FROM EXCEL (no-print) -->
+  <div id="pasteModal" class="no-print fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-xl max-w-2xl w-full p-5 shadow-2xl border border-slate-200">
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          Paste 20+ Rows from Excel / Google Sheets
+        </h3>
+        <button onclick="closePasteModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <p class="text-[11px] text-slate-600 mb-2 leading-relaxed">
+        Copy entire columns in Excel and paste (<kbd class="px-1 py-0.5 bg-slate-100 rounded text-slate-800 font-mono text-[10px]">Ctrl+V</kbd>) into the box below.<br/>
+        <strong class="text-slate-800">Order:</strong> Description &bull; HSN &bull; Qty &bull; Unit &bull; Rate &bull; Disc% &bull; GST%
+      </p>
+
+      <textarea id="pasteInputText" rows="8" class="w-full text-xs font-mono p-2.5 border border-slate-300 rounded-lg focus:ring-1 focus:ring-emerald-500 focus:outline-none mb-3" placeholder="GHEE RICE DP 25KG&#9;10063090&#9;4&#9;OTH&#9;5027&#9;0&#9;5&#10;TATA SALT 1KG&#9;25010090&#9;20&#9;OTH&#9;20&#9;0&#9;0&#10;DALDA 1 KG&#9;15141200&#9;20&#9;OTH&#9;195&#9;0&#9;5"></textarea>
+
+      <div class="flex justify-end gap-2">
+        <button onclick="closePasteModal()" class="px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg">Cancel</button>
+        <button onclick="processPastedText()" class="px-4 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-xs">Import Items</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER (no-print) -->
+  <div id="toast" class="no-print fixed bottom-5 right-5 bg-slate-900 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
+    <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+    <span id="toastMsg">Notification</span>
+  </div>
+
+  <!-- APPLICATION JAVASCRIPT -->
+  <script>
+    let taxType = 'intra'; // Kerala Intra-State (CGST + SGST)
+    let isCompact = true; // Density mode
+
+    // Preloaded with the items from your grocery/supermarket bill
+    let itemsData = [
+      { id: 1, desc: "GHEE RICE DP 25KG", hsn: "10063090", qty: 4, unit: "OTH", rate: 5027, disc: 0, gstRate: 5 },
+      { id: 2, desc: "TATA SALT 1KG", hsn: "25010090", qty: 20, unit: "OTH", rate: 20, disc: 0, gstRate: 0 },
+      { id: 3, desc: "DALDA 1 KG", hsn: "15141200", qty: 20, unit: "OTH", rate: 195, disc: 0, gstRate: 5 },
+      { id: 4, desc: "RUCHI OIL 850G BOX", hsn: "15119020", qty: 10, unit: "OTH", rate: 1550, disc: 0, gstRate: 5 },
+      { id: 5, desc: "ALFA COCONUTOIL 1L BOX", hsn: "15131900", qty: 10, unit: "OTH", rate: 2750, disc: 0, gstRate: 5 },
+      { id: 6, desc: "SUGAR 1KG", hsn: "17011490", qty: 80, unit: "OTH", rate: 67, disc: 0, gstRate: 5 },
+      { id: 7, desc: "RKD 1L", hsn: "4059020", qty: 10, unit: "OTH", rate: 835, disc: 0, gstRate: 5 },
+      { id: 8, desc: "SUPER DATES PICKLE 5KG", hsn: "200190", qty: 5, unit: "OTH", rate: 580, disc: 0, gstRate: 5 },
+      { id: 9, desc: "DOUBLE HORSE PALADA 300G", hsn: "21069000", qty: 10, unit: "OTH", rate: 86, disc: 0, gstRate: 18 },
+      { id: 10, desc: "AMIS PATHIPODI 1KG", hsn: "11029090", qty: 10, unit: "OTH", rate: 72, disc: 0, gstRate: 5 },
+      { id: 11, desc: "EASTERN CHILLI POWDER 500G", hsn: "9042211", qty: 12, unit: "OTH", rate: 370, disc: 0, gstRate: 5 },
+      { id: 12, desc: "EASTERN TURMERIC POWDER 250G", hsn: "9103030", qty: 10, unit: "OTH", rate: 87, disc: 0, gstRate: 5 },
+      { id: 13, desc: "DAIRY WHITENER EVERYDAY 1KG", hsn: "4022990", qty: 5, unit: "OTH", rate: 565, disc: 0, gstRate: 5 },
+      { id: 14, desc: "BRU COFFEE POWDER 200G", hsn: "21011120", qty: 5, unit: "OTH", rate: 305, disc: 0, gstRate: 5 },
+      { id: 15, desc: "SURF EXCEL 1KG", hsn: "34022010", qty: 6, unit: "OTH", rate: 186, disc: 0, gstRate: 18 },
+      { id: 16, desc: "MAIDA LOOSE 1KG", hsn: "11010000", qty: 50, unit: "OTH", rate: 46, disc: 0, gstRate: 0 },
+      { id: 17, desc: "KANNAN DEVAN 250G", hsn: "9023020", qty: 10, unit: "OTH", rate: 63, disc: 0, gstRate: 5 },
+      { id: 18, desc: "PANDA PICKLE POWDER 100G", hsn: "9109100", qty: 80, unit: "OTH", rate: 50, disc: 0, gstRate: 5 },
+      { id: 19, desc: "ADITI RICE BRAN OIL BOX", hsn: "15159040", qty: 10, unit: "OTH", rate: 1810, disc: 0, gstRate: 5 },
+      { id: 20, desc: "PAVITHRAM SESAME OIL 1L", hsn: "15155091", qty: 5, unit: "OTH", rate: 270, disc: 0, gstRate: 5 },
+      { id: 21, desc: "MILK MAID 380G", hsn: "4029920", qty: 15, unit: "OTH", rate: 146, disc: 0, gstRate: 5 },
+      { id: 22, desc: "AJMI PUTTUPODI 1KG", hsn: "11023000", qty: 15, unit: "OTH", rate: 78, disc: 0, gstRate: 5 },
+      { id: 23, desc: "SABEENA POWDER 1KG", hsn: "34054000", qty: 15, unit: "OTH", rate: 39, disc: 0, gstRate: 18 },
+      { id: 24, desc: "DOUBLE HORSE RAWA 500G", hsn: "11010000", qty: 20, unit: "OTH", rate: 57, disc: 0, gstRate: 5 },
+      { id: 25, desc: "AASHIRVAD ATTA 1KG", hsn: "11010000", qty: 50, unit: "OTH", rate: 72, disc: 0, gstRate: 0 },
+      { id: 26, desc: "EASTERN SAMBAR POWDER 100G", hsn: "9109100", qty: 50, unit: "OTH", rate: 56, disc: 0, gstRate: 5 },
+      { id: 27, desc: "EASTERN CHICKEN MASALA 100G", hsn: "9109100", qty: 50, unit: "OTH", rate: 58, disc: 0, gstRate: 5 },
+      { id: 28, desc: "EASTERN GARAM MASALA 50G", hsn: "9109100", qty: 25, unit: "OTH", rate: 56, disc: 0, gstRate: 5 },
+      { id: 29, desc: "TANG 500G", hsn: "21069050", qty: 3, unit: "OTH", rate: 127, disc: 0, gstRate: 5 },
+      { id: 30, desc: "GHEE RICE DP 25KG (2ND LOT)", hsn: "10063090", qty: 3, unit: "OTH", rate: 5027, disc: 0, gstRate: 0 }
+    ];
+
+    // Helper: Format Date to DD-MMM-YYYY (e.g. 02-Sep-2026)
+    function formatDateToDDMMMYYYY(dateObj) {
+      if (!dateObj || isNaN(dateObj.getTime())) return '';
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const month = months[dateObj.getMonth()];
+      const year = dateObj.getFullYear();
+      return `${day}-${month}-${year}`;
+    }
+
+    function parseISODate(isoStr) {
+      if (!isoStr) return new Date();
+      const parts = isoStr.split('-');
+      return new Date(parts[0], parts[1] - 1, parts[2]);
+    }
+
+    function syncDate(inputId, displayId) {
+      const input = document.getElementById(inputId);
+      const display = document.getElementById(displayId);
+      if (input.value) {
+        display.value = formatDateToDDMMMYYYY(parseISODate(input.value));
+      }
+    }
+
+    function initDates() {
+      const today = new Date();
+      const dueDate = new Date();
+      dueDate.setDate(today.getDate() + 15);
+
+      const toISO = (d) => d.toISOString().split('T')[0];
+
+      document.getElementById('invDateInput').value = toISO(today);
+      document.getElementById('invDateDisplay').value = formatDateToDDMMMYYYY(today);
+
+      document.getElementById('dueDateInput').value = toISO(dueDate);
+      document.getElementById('dueDateDisplay').value = formatDateToDDMMMYYYY(dueDate);
+    }
+
+    document.getElementById('compName').addEventListener('input', function(e) {
+      document.getElementById('signatoryCompName').innerText = e.target.value || 'HEXA SUPER MARKET';
+    });
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      toastMsg.innerText = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 2500);
+    }
+
+    function toggleDensity() {
+      isCompact = !isCompact;
+      document.getElementById('densityLabel').innerText = isCompact ? 'Compact View' : 'Standard View';
+      renderItems();
+      showToast(`Density set to ${isCompact ? 'Compact' : 'Standard'}`);
+    }
+
+    function setTaxType(type) {
+      taxType = type;
+      const btnIntra = document.getElementById('btnIntra');
+      const btnInter = document.getElementById('btnInter');
+
+      if (type === 'intra') {
+        btnIntra.className = "px-2 py-1 rounded font-medium text-white bg-indigo-600 transition text-[11px]";
+        btnInter.className = "px-2 py-1 rounded font-medium text-slate-600 hover:text-slate-900 transition text-[11px]";
+        showToast("Tax mode: CGST + SGST (Kerala Intra-State)");
+      } else {
+        btnInter.className = "px-2 py-1 rounded font-medium text-white bg-indigo-600 transition text-[11px]";
+        btnIntra.className = "px-2 py-1 rounded font-medium text-slate-600 hover:text-slate-900 transition text-[11px]";
+        showToast("Tax mode: IGST (Inter-State)");
+      }
+      calculateAll();
+    }
+
+    function loadLogo(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const img = document.getElementById('companyLogoImg');
+          img.src = event.target.result;
+          img.classList.remove('hidden');
+          document.getElementById('logoPlaceholder').classList.add('hidden');
+          document.getElementById('removeLogoBtn').classList.remove('hidden');
+          showToast("Logo attached");
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function removeLogo(e) {
+      e.stopPropagation();
+      document.getElementById('companyLogoImg').src = "";
+      document.getElementById('companyLogoImg').classList.add('hidden');
+      document.getElementById('logoPlaceholder').classList.remove('hidden');
+      document.getElementById('removeLogoBtn').classList.add('hidden');
+      document.getElementById('logoInput').value = "";
+      showToast("Logo removed");
+    }
+
+    function copyBillingToShipping() {
+      document.getElementById('shipToName').value = document.getElementById('billToName').value;
+      document.getElementById('shipToAddress').value = document.getElementById('billToAddress').value;
+      document.getElementById('shipToGST').value = document.getElementById('billToGST').value;
+      document.getElementById('shipToState').value = document.getElementById('billToState').value;
+      showToast("Billing address copied to Shipping");
+    }
+
+    function renderItems() {
+      const tbody = document.getElementById('invoiceItemsBody');
+      tbody.innerHTML = '';
+
+      const paddingClass = isCompact ? "py-0.5 px-1" : "py-1.5 px-1.5";
+      const fontSizeClass = isCompact ? "text-[9.5px]" : "text-[10.5px]";
+
+      itemsData.forEach((item, index) => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition";
+        tr.innerHTML = `
+          <td class="${paddingClass} text-center text-slate-400 font-bold ${fontSizeClass}">${index + 1}</td>
+          <td class="${paddingClass}">
+            <input type="text" class="inv-input w-full p-0.5 ${fontSizeClass} font-semibold text-slate-900" value="${escapeHTML(item.desc)}" oninput="updateItemField(${index}, 'desc', this.value)" placeholder="Item Description" />
+          </td>
+          <td class="${paddingClass} text-center">
+            <input type="text" value="${escapeHTML(item.hsn)}" class="inv-input w-full text-center ${fontSizeClass} p-0.5 text-slate-600" oninput="updateItemField(${index}, 'hsn', this.value)" placeholder="HSN" />
+          </td>
+          <td class="${paddingClass} text-right">
+            <input type="number" min="0" step="any" value="${item.qty}" class="inv-input w-10 text-right ${fontSizeClass} p-0.5 font-semibold text-slate-800" oninput="updateItemField(${index}, 'qty', parseFloat(this.value) || 0)" />
+          </td>
+          <td class="${paddingClass} text-center">
+            <input type="text" value="${escapeHTML(item.unit)}" class="inv-input w-10 text-center ${fontSizeClass} p-0.5 uppercase text-slate-600" oninput="updateItemField(${index}, 'unit', this.value)" placeholder="PCS" />
+          </td>
+          <td class="${paddingClass} text-right">
+            <input type="number" min="0" step="any" value="${item.rate}" class="inv-input w-16 text-right ${fontSizeClass} p-0.5 font-semibold text-slate-800" oninput="updateItemField(${index}, 'rate', parseFloat(this.value) || 0)" />
+          </td>
+          <td class="${paddingClass} text-right">
+            <input type="number" min="0" max="100" step="any" value="${item.disc}" class="inv-input w-10 text-right ${fontSizeClass} p-0.5 text-slate-600" oninput="updateItemField(${index}, 'disc', parseFloat(this.value) || 0)" />
+          </td>
+          <td class="${paddingClass} text-right font-semibold text-slate-800 ${fontSizeClass}">
+            <span id="taxable_${index}">0.00</span>
+          </td>
+          <td class="${paddingClass} text-right">
+            <select class="inv-input ${fontSizeClass} p-0.5 font-medium text-slate-700 bg-white" onchange="updateItemField(${index}, 'gstRate', parseFloat(this.value))">
+              <option value="0" ${item.gstRate === 0 ? 'selected' : ''}>0%</option>
+              <option value="5" ${item.gstRate === 5 ? 'selected' : ''}>5%</option>
+              <option value="12" ${item.gstRate === 12 ? 'selected' : ''}>12%</option>
+              <option value="18" ${item.gstRate === 18 ? 'selected' : ''}>18%</option>
+              <option value="28" ${item.gstRate === 28 ? 'selected' : ''}>28%</option>
+            </select>
+          </td>
+          <td class="${paddingClass} text-right text-slate-700 ${fontSizeClass}">
+            <span id="gstAmount_${index}">0.00</span>
+          </td>
+          <td class="${paddingClass} text-right font-bold text-slate-900 ${fontSizeClass}">
+            <span id="total_${index}">0.00</span>
+          </td>
+          <td class="${paddingClass} text-center no-print">
+            <button type="button" onclick="removeItemRow(${index})" class="text-slate-300 hover:text-red-500 p-0.5 rounded transition" title="Delete">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('itemCountDisplay').innerText = itemsData.length;
+      calculateAll();
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function updateItemField(index, field, value) {
+      if (itemsData[index]) {
+        itemsData[index][field] = value;
+        calculateAll();
+      }
+    }
+
+    function addNewRow() {
+      itemsData.push({
+        id: Date.now() + Math.random(),
+        desc: "New Item Description",
+        hsn: "2106",
+        qty: 1,
+        unit: "OTH",
+        rate: 100,
+        disc: 0,
+        gstRate: 5
+      });
+      renderItems();
+    }
+
+    function addMultipleRows(count) {
+      for (let i = 0; i < count; i++) {
+        itemsData.push({
+          id: Date.now() + Math.random() + i,
+          desc: `New Item ${itemsData.length + 1}`,
+          hsn: "2106",
+          qty: 1,
+          unit: "OTH",
+          rate: 100,
+          disc: 0,
+          gstRate: 5
+        });
+      }
+      renderItems();
+      showToast(`Added ${count} new item rows`);
+    }
+
+    function clearAllRows() {
+      itemsData = [];
+      addNewRow();
+      showToast("Cleared table");
+    }
+
+    function removeItemRow(index) {
+      if (itemsData.length <= 1) {
+        showToast("Invoice must contain at least 1 item");
+        return;
+      }
+      itemsData.splice(index, 1);
+      renderItems();
+    }
+
+    function calculateAll() {
+      let totalTaxable = 0;
+      let totalGST = 0;
+      let grossTotal = 0;
+
+      itemsData.forEach((item, i) => {
+        const qty = parseFloat(item.qty) || 0;
+        const rate = parseFloat(item.rate) || 0;
+        const discPercent = parseFloat(item.disc) || 0;
+        const gstRate = parseFloat(item.gstRate) || 0;
+
+        const baseAmount = qty * rate;
+        const discountAmount = baseAmount * (discPercent / 100);
+        const taxableValue = Math.max(0, baseAmount - discountAmount);
+
+        const gstAmount = taxableValue * (gstRate / 100);
+        const rowTotal = taxableValue + gstAmount;
+
+        totalTaxable += taxableValue;
+        totalGST += gstAmount;
+        grossTotal += rowTotal;
+
+        const elTaxable = document.getElementById(`taxable_${i}`);
+        const elGst = document.getElementById(`gstAmount_${i}`);
+        const elTotal = document.getElementById(`total_${i}`);
+
+        if (elTaxable) elTaxable.innerText = taxableValue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (elGst) elGst.innerText = gstAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (elTotal) elTotal.innerText = rowTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      });
+
+      const lessAdvanceInput = parseFloat(document.getElementById('lessAdvance').value) || 0;
+      const rawBalance = grossTotal - lessAdvanceInput;
+      
+      const roundedBalance = Math.round(rawBalance);
+      const roundOff = (roundedBalance - rawBalance);
+
+      document.getElementById('summaryTaxable').innerText = totalTaxable.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('summaryGST').innerText = totalGST.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('summaryGrossTotal').innerText = grossTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('summaryRoundOff').innerText = (roundOff >= 0 ? '+' : '') + roundOff.toFixed(2);
+      document.getElementById('summaryNetDue').innerText = Math.max(0, roundedBalance).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      const taxContainer = document.getElementById('taxSplitContainer');
+      if (taxType === 'intra') {
+        const halfGst = totalGST / 2;
+        taxContainer.innerHTML = `
+          <div class="flex justify-between items-center text-slate-600">
+            <span>Central GST (CGST):</span>
+            <span class="font-medium text-slate-800">₹ ${halfGst.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+          </div>
+          <div class="flex justify-between items-center text-slate-600">
+            <span>State GST (SGST):</span>
+            <span class="font-medium text-slate-800">₹ ${halfGst.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+          </div>
+        `;
+      } else {
+        taxContainer.innerHTML = `
+          <div class="flex justify-between items-center text-slate-600">
+            <span>Integrated GST (IGST):</span>
+            <span class="font-medium text-slate-800">₹ ${totalGST.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+          </div>
+        `;
+      }
+
+      const amountToConvert = Math.max(0, roundedBalance > 0 ? roundedBalance : grossTotal);
+      document.getElementById('amountInWords').innerText = convertNumberToIndianWords(amountToConvert);
+    }
+
+    function convertNumberToIndianWords(num) {
+      if (num === 0) return "Rupees Zero Only";
+      
+      const ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", 
+                    "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+      const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+
+      function convertGroup(n) {
+        let str = "";
+        if (n >= 100) {
+          str += ones[Math.floor(n / 100)] + " Hundred ";
+          n %= 100;
+        }
+        if (n >= 20) {
+          str += tens[Math.floor(n / 10)] + " ";
+          n %= 10;
+        }
+        if (n > 0) {
+          str += ones[n] + " ";
+        }
+        return str.trim();
+      }
+
+      const integerPart = Math.floor(num);
+      const decimalPart = Math.round((num - integerPart) * 100);
+
+      let result = "";
+
+      const crores = Math.floor(integerPart / 10000000);
+      const lakhs = Math.floor((integerPart % 10000000) / 100000);
+      const thousands = Math.floor((integerPart % 100000) / 1000);
+      const remainder = integerPart % 1000;
+
+      if (crores > 0) result += convertGroup(crores) + " Crore ";
+      if (lakhs > 0) result += convertGroup(lakhs) + " Lakh ";
+      if (thousands > 0) result += convertGroup(thousands) + " Thousand ";
+      if (remainder > 0) result += convertGroup(remainder) + " ";
+
+      result = "Rupees " + result.trim();
+
+      if (decimalPart > 0) {
+        result += " and " + convertGroup(decimalPart) + " Paise";
+      }
+
+      return result + " Only";
+    }
+
+    function openPasteModal() {
+      document.getElementById('pasteModal').classList.remove('hidden');
+      document.getElementById('pasteInputText').focus();
+    }
+
+    function closePasteModal() {
+      document.getElementById('pasteModal').classList.add('hidden');
+      document.getElementById('pasteInputText').value = "";
+    }
+
+    function processPastedText() {
+      const rawText = document.getElementById('pasteInputText').value.trim();
+      if (!rawText) {
+        closePasteModal();
+        return;
+      }
+
+      const lines = rawText.split(/\r?\n/);
+      const parsedItems = [];
+
+      lines.forEach((line) => {
+        if (!line.trim()) return;
+        const cols = line.includes('\t') ? line.split('\t') : line.split(',');
+        if (cols.length >= 2) {
+          parsedItems.push({
+            id: Date.now() + Math.random(),
+            desc: cols[0]?.trim() || "Item Description",
+            hsn: cols[1]?.trim() || "",
+            qty: parseFloat(cols[2]) || 1,
+            unit: cols[3]?.trim() || "OTH",
+            rate: parseFloat(cols[4]) || 0,
+            disc: parseFloat(cols[5]) || 0,
+            gstRate: parseFloat(cols[6]) !== undefined ? parseFloat(cols[6]) : 5
+          });
+        }
+      });
+
+      if (parsedItems.length > 0) {
+        itemsData = parsedItems;
+        renderItems();
+        closePasteModal();
+        showToast(`Imported ${parsedItems.length} items from Excel/Sheets`);
+      } else {
+        showToast("Invalid table format. Verify columns.");
+      }
+    }
+
+    function handleCSVUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        const lines = text.split(/\r?\n/);
+        const parsed = [];
+
+        let startIndex = 0;
+        if (lines[0] && (lines[0].toLowerCase().includes('item') || lines[0].toLowerCase().includes('description'))) {
+          startIndex = 1;
+        }
+
+        for (let i = startIndex; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (!line) continue;
+          
+          const cols = line.split(',').map(c => c.replace(/^["']|["']$/g, '').trim());
+          if (cols.length >= 2) {
+            parsed.push({
+              id: Date.now() + i,
+              desc: cols[0] || "Imported Item",
+              hsn: cols[1] || "",
+              qty: parseFloat(cols[2]) || 1,
+              unit: cols[3] || "OTH",
+              rate: parseFloat(cols[4]) || 0,
+              disc: parseFloat(cols[5]) || 0,
+              gstRate: parseFloat(cols[6]) !== undefined ? parseFloat(cols[6]) : 5
+            });
+          }
+        }
+
+        if (parsed.length > 0) {
+          itemsData = parsed;
+          renderItems();
+          showToast(`Imported ${parsed.length} items from CSV`);
+        } else {
+          showToast("Could not parse items");
+        }
+        event.target.value = "";
+      };
+      reader.readAsText(file);
+    }
+
+    function downloadSampleCSV() {
+      const csvContent = "Item Description,HSN/SAC,Qty,Unit,Rate,Discount %,GST %\n" +
+        "GHEE RICE DP 25KG,10063090,4,OTH,5027,0,5\n" +
+        "TATA SALT 1KG,25010090,20,OTH,20,0,0\n" +
+        "DALDA 1 KG,15141200,20,OTH,195,0,5\n" +
+        "RUCHI OIL 850G BOX,15119020,10,OTH,1550,0,5";
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", "supermarket_invoice_template.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("Sample CSV Downloaded");
+    }
+
+    // MULTI-PAGE AWARE PDF GENERATOR
+    function downloadPDF() {
+      const element = document.getElementById('invoiceElement');
+      const invNo = document.getElementById('invNo').value || 'Invoice';
+      const pdfBtn = document.getElementById('pdfBtn');
+
+      pdfBtn.disabled = true;
+      pdfBtn.innerHTML = `<svg class="w-3.5 h-3.5 animate-spin inline" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg> Rendering...`;
+
+      const opt = {
+        margin: [6, 4, 6, 4],
+        filename: `${invNo}_Tax_Invoice.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+          scale: 2, 
+          useCORS: true, 
+          logging: false,
+          scrollY: 0
+        },
+        jsPDF: { 
+          unit: 'mm', 
+          format: 'a4', 
+          orientation: 'portrait',
+          compress: true
+        },
+        pagebreak: { 
+          mode: ['css', 'legacy'],
+          avoid: ['tr', '.pdf-avoid-break']
+        }
+      };
+
+      html2pdf().set(opt).from(element).save().then(() => {
+        pdfBtn.disabled = false;
+        pdfBtn.innerHTML = `<svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> Download PDF`;
+        showToast("PDF Downloaded successfully!");
+      }).catch(err => {
+        console.error(err);
+        pdfBtn.disabled = false;
+        pdfBtn.innerHTML = `Download PDF`;
+        showToast("Error generating PDF. You can also use Print -> Save as PDF");
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initDates();
+      renderItems();
+    });
+  </script>
+</body>
+</html>
