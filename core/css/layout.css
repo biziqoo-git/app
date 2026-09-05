@@ -1,0 +1,8 @@
+/* Shared responsive application frame */
+.bq-app{min-height:100dvh}
+.bq-main-frame{min-height:100dvh;margin-left:0;padding-bottom:var(--bottom-nav-height)}
+.bq-main{min-height:calc(100dvh - var(--header-height));overflow:auto}
+@media(min-width:1024px){
+  .bq-main-frame{margin-left:var(--sidebar-width);padding-bottom:0}
+  .bq-main{min-height:calc(100dvh - var(--header-height))}
+}

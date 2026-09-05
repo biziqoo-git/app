@@ -1,0 +1,5 @@
+/* Responsive rules shared by every client */
+@media(max-width:767px){
+  :root{--header-height:58px}
+  .bq-header{padding:0 14px}
+}

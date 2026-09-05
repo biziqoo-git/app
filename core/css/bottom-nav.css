@@ -1,0 +1,8 @@
+/* Fixed shared mobile bottom navigation */
+.bq-bottom-nav{display:none}
+@media(max-width:1023px){
+  .bq-bottom-nav{position:fixed;left:0;right:0;bottom:0;height:var(--bottom-nav-height);padding-bottom:env(safe-area-inset-bottom);background:#fff;border-top:1px solid var(--border);z-index:900;grid-template-columns:repeat(5,1fr)}
+  .bq-bottom-item{border:0;background:transparent;color:var(--text-muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:10px;font-weight:600}
+  .bq-bottom-item i{width:21px;height:21px}
+  .bq-bottom-item.active{color:var(--primary)}
+}
